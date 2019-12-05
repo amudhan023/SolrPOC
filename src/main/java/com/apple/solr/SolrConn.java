@@ -46,7 +46,7 @@ public class SolrConn {
         }
     }
 
-    private void addProductDocs() throws IOException, SolrServerException {
+    public void addProductDocs() throws IOException, SolrServerException {
         final SolrClient client = getSolrClient();
 
         final SolrInputDocument doc = new SolrInputDocument();
