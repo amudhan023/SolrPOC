@@ -3,6 +3,7 @@ package com.apple.solr;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
@@ -16,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class SolrConn {
-    public HttpSolrClient getSolrClient() {
+    public static HttpSolrClient getSolrClient() {
         //  SolrClient solr = new CloudSolrClient.Builder().withSolrUrl("http://localhost:8983/solr").build();
         String solrUrl = "http://localhost:8983/solr";
         return new HttpSolrClient.Builder(solrUrl)
@@ -60,8 +61,37 @@ public class SolrConn {
         System.out.println(" Added document ");
     }
 
-    public static void main(String a[]) throws IOException, SolrServerException{
-        SolrConn obj=new SolrConn();
+
+    public static void updateDocs() throws SolrServerException, IOException {
+        //Preparing the Solr client
+        final SolrClient client = getSolrClient();
+        //Preparing the Solr document
+        SolrInputDocument doc = new SolrInputDocument();
+        doc.addField("id", "002");
+        doc.addField("name", "Fire Tablet");
+
+        UpdateRequest updateRequest = new UpdateRequest();
+        updateRequest.setAction(UpdateRequest.ACTION.COMMIT, false, false);
+        updateRequest.add(doc);
+
+        UpdateResponse rsp = updateRequest.process(client, "techproducts");
+        System.out.println("Documents Updated");
+    }
+
+    public static void deleteDocs() throws SolrServerException, IOException {
+        //Preparing the Solr client
+        final SolrClient client = getSolrClient();
+        //Preparing the Solr document
+        SolrInputDocument doc = new SolrInputDocument();
+        //Deleting the documents from Solr
+        client.deleteByQuery("*");
+        //Saving the document
+        client.commit();
+        System.out.println("Documents deleted");
+    }
+
+    public static void main(String a[]) throws IOException, SolrServerException {
+        SolrConn obj = new SolrConn();
         obj.getProductDocs();
         obj.addProductDocs();
     }
